@@ -1,36 +1,62 @@
-import * as React from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View, Button, Image } from 'react-native';
+import ImagePicker from 'react-native-image-picker'
 
-const instructions = Platform.select({
-  ios: `Press Cmd+R to reload,\nCmd+D or shake for dev menu`,
-  android: `Double tap R on your keyboard to reload,\nShake or press menu button for dev menu`,
-});
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      filePath: {},
+    };
+  }
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.welcome}>Welcome to React Native!</Text>
-      <Text style={styles.instructions}>To get started, edit App.js</Text>
-      <Text style={styles.instructions}>{instructions}</Text>
-    </View>
-  );
+  chooseFile = () => {
+    var options = {
+      title: 'Select Image',
+    };
+    ImagePicker.showImagePicker(options, response => {
+      console.log('response', JSON.stringify(response));
+      if (response.didCancel) {
+        console.log("User cancelled image picker");
+      }
+      else {  
+        let source = response;
+        this.setState({
+          filePath: source,
+        });
+      }
+    });
+  };
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={styles.container}>
+          <Image source={{
+            uri: 'data:image/jpeg;base64,' + this.state.filePath.data,
+          }}
+            style={{ width: 100, height: 100 }}
+          />
+          <Image
+            source={{ uri: this.state.filePath.uri }}
+            style={{ width: 250, height: 250 }}
+          />
+          <Text style={{ alignItems: 'center' }}>
+            {this.state.filePath.uri}
+          </Text>
+          <Button
+            title="Choose File"
+            onPress={this.chooseFile.bind(this)} />
+        </View>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#fff',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
+    justifyContent: 'center'
+  }
+})
